@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2333;
+    --bg-card-hover: #21273a;
+    --border: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent-trail: #3fb950;
+    --accent-trail-dim: #1a3a22;
+    --accent-denali: #58a6ff;
+    --accent-denali-dim: #0d2340;
+    --accent-yellow: #d29922;
+    --accent-yellow-dim: #2d2010;
+    --accent-red: #f85149;
+    --accent-red-dim: #3d1219;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .logo span { color: var(--accent-trail); }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .streak-badge .fire { font-size: 1rem; }
+  .streak-count { color: var(--accent-yellow); }
+  .gear-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background 0.2s;
+  }
+  .gear-btn:hover { color: var(--text-primary); background: var(--bg-card); }
+
+  /* Tabs */
+  .tabs {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+  .tabs-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent-trail); }
+
+  /* Main content */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px;
+  }
+
+  /* Today view */
+  .today-header {
+    margin-bottom: 24px;
+  }
+  .today-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .today-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .workout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 700px) {
+    .workout-grid { grid-template-columns: 1fr; }
+  }
+  .workout-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: border-color 0.2s;
+  }
+  .workout-card.trail-card { border-top: 3px solid var(--accent-trail); }
+  .workout-card.denali-card { border-top: 3px solid var(--accent-denali); }
+  .workout-card.completed { opacity: 0.7; }
+  .card-plan-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .trail-card .card-plan-label { color: var(--accent-trail); }
+  .denali-card .card-plan-label { color: var(--accent-denali); }
+  .card-phase {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .card-workout-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .card-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .complete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    padding: 11px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+    margin-top: auto;
+  }
+  .trail-card .complete-btn:hover:not(.done) {
+    border-color: var(--accent-trail);
+    color: var(--accent-trail);
+    background: var(--accent-trail-dim);
+  }
+  .denali-card .complete-btn:hover:not(.done) {
+    border-color: var(--accent-denali);
+    color: var(--accent-denali);
+    background: var(--accent-denali-dim);
+  }
+  .complete-btn.done {
+    border-color: var(--accent-trail);
+    color: var(--accent-trail);
+    background: var(--accent-trail-dim);
+    cursor: default;
+  }
+  .denali-card .complete-btn.done {
+    border-color: var(--accent-denali);
+    color: var(--accent-denali);
+    background: var(--accent-denali-dim);
+  }
+
+  /* Rest day card */
+  .rest-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Calendar view */
+  .calendar-section { margin-bottom: 48px; }
+  .cal-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .cal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .cal-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .cal-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-dot.done { background: var(--accent-trail); }
+  .legend-dot.today { background: var(--accent-yellow); }
+  .legend-dot.missed { background: var(--accent-red); }
+  .legend-dot.upcoming { background: var(--bg-card); border: 1px solid var(--border); }
+  .week-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .week-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    width: 44px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .day-squares {
+    display: flex;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+  .day-sq {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .day-sq:hover { border-color: var(--text-muted); }
+  .day-sq.done { background: var(--accent-trail-dim); border-color: var(--accent-trail); color: var(--accent-trail); }
+  .day-sq.done-denali { background: var(--accent-denali-dim); border-color: var(--accent-denali); color: var(--accent-denali); }
+  .day-sq.today-sq { background: var(--accent-yellow-dim); border-color: var(--accent-yellow); color: var(--accent-yellow); font-weight: 700; }
+  .day-sq.missed { background: var(--accent-red-dim); border-color: var(--accent-red); color: var(--accent-red); }
+  .day-sq.rest { opacity: 0.4; cursor: default; }
+  .day-sq.rest:hover { border-color: var(--border); }
+  @media (max-width: 600px) {
+    .day-sq { width: 26px; height: 26px; font-size: 0.6rem; border-radius: 4px; }
+    .day-squares { gap: 3px; }
+    .week-row { gap: 4px; }
+    .week-label { width: 32px; font-size: 0.65rem; }
+  }
+  .day-header-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 8px;
+    padding-left: 52px;
+  }
+  .day-header-lbl {
+    width: 34px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 600px) {
+    .day-header-row { padding-left: 36px; gap: 3px; }
+    .day-header-lbl { width: 26px; font-size: 0.58rem; }
+  }
+
+  /* Tooltip */
+  .tooltip-wrap { position: relative; }
+  .tooltip-wrap .tooltip-box {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d333b;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 200px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    z-index: 200;
+    pointer-events: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .tooltip-wrap:hover .tooltip-box { display: block; }
+  .tooltip-box .tt-date { color: var(--text-muted); font-size: 0.7rem; margin-bottom: 4px; }
+
+  /* Modal / Settings */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+  }
+  .modal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .modal-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--accent-trail); }
+  .form-select option { background: var(--bg-card); }
+  .email-display {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: var(--accent-trail);
+    font-weight: 600;
+    min-height: 42px;
+    word-break: break-all;
+  }
+  .email-hint {
+    font-size: 0.77rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--text-primary); }
+  .save-btn {
+    width: 100%;
+    background: var(--accent-trail);
+    color: #0d1117;
+    border: none;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.2s;
+    margin-top: 8px;
+  }
+  .save-btn:hover { opacity: 0.85; }
+
+  /* Phase badges */
+  .phase-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .phase-badge.trail { background: var(--accent-trail-dim); color: var(--accent-trail); }
+  .phase-badge.denali { background: var(--accent-denali-dim); color: var(--accent-denali); }
+
+  .hidden { display: none !important; }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .progress-bar-fill.trail { background: var(--accent-trail); }
+  .progress-bar-fill.denali { background: var(--accent-denali); }
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">Training<span>Hub</span></div>
+    <div class="header-right">
+      <div class="streak-badge">
+        <span class="fire">🔥</span>
+        <span class="streak-count" id="streakCount">0</span>
+        <span style="color:var(--text-muted);font-weight:400">day streak</span>
+      </div>
+      <button class="gear-btn" onclick="openSettings()" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="switchTab('today')">Today</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- TODAY VIEW -->
+  <div class="view active" id="view-today">
+    <div class="today-header">
+      <div class="today-date" id="todayDate"></div>
+      <div class="today-title" id="todayTitle">Today's Training</div>
+    </div>
+    <div class="workout-grid" id="workoutGrid"></div>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="view" id="view-calendar">
+    <div class="calendar-section" id="calTrail"></div>
+    <div class="calendar-section" id="calDenali"></div>
+  </div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettings()">✕</button>
+    <div class="modal-title">Notification Setup</div>
+    <div class="modal-subtitle">Enter your info below to generate your SMS email address. Use it to set up reminders via any email app — no backend required.</div>
+    <div class="form-group">
+      <label class="form-label">Phone Number (10 digits)</label>
+      <input class="form-input" type="tel" id="phoneInput" placeholder="5551234567" maxlength="10" oninput="updateEmail()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Carrier</label>
+      <select class="form-select" id="carrierSelect" onchange="updateEmail()">
+        <option value="">Select carrier…</option>
+        <option value="tmomail.net">T-Mobile</option>
+        <option value="vtext.com">Verizon</option>
+        <option value="txt.att.net">AT&amp;T</option>
+        <option value="messaging.sprintpcs.com">Sprint</option>
+        <option value="mymetropcs.com">Metro PCS</option>
+        <option value="sms.myboostmobile.com">Boost Mobile</option>
+        <option value="smtext.com">Cricket</option>
+        <option value="msg.fi.google.com">Google Fi</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your SMS Email Address</label>
+      <div class="email-display" id="emailDisplay">—</div>
+      <div class="email-hint">Send your daily workout reminder to this address from any email client. Set it as a scheduled email at your preferred workout time.</div>
+    </div>
+    <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+const START_DATE = new Date('2026-06-01T00:00:00');
+
+// Trail Run Plan — 16 weeks
+const TRAIL_PLAN = [];
+const trailPhases = ['Phase 1 · Base', 'Phase 2 · Build', 'Phase 3 · Peak', 'Phase 4 · Taper'];
+const trailLongRuns = {
+  1:'10km',2:'12km',3:'14km',4:'8km recovery',
+  5:'16km',6:'19km',7:'22km',8:'12km recovery',
+  9:'25km',10:'28km',11:'32km',12:'16km recovery',
+  13:'35km',14:'24km',15:'16km',16:'RACE DAY 🏆'
+};
+
+function trailDay(week, dow) {
+  // dow: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
+  const phase = Math.ceil(week / 4); // 1-4
+  if (phase === 1) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'30 min easy pace'},
+      {emoji:'😴',name:'Rest or Yoga',detail:'Active recovery — stretch & breathe',rest:true},
+      {emoji:'🏃',name:'Easy Run + Strides',detail:'35 min easy + 4×20s strides'},
+      {emoji:'🚴',name:'Cross-Train',detail:'30 min bike or swim'},
+      {emoji:'😴',name:'Rest',detail:'Full rest day',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[week]}`,detail:`Trail long run — ${trailLongRuns[week]}, easy effort`},
+      {emoji:'🥾',name:'Easy Hike',detail:'45 min easy hike or walk'},
+    ];
+    return days[dow];
+  }
+  if (phase === 2) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'40 min easy pace'},
+      {emoji:'🏋️',name:'Strength',detail:'Legs & core — squats, lunges, planks'},
+      {emoji:'🏃',name:'Tempo Run',detail:'40 min tempo (comfortably hard)'},
+      {emoji:'🏃',name:'Easy Run',detail:'35 min easy pace'},
+      {emoji:'😴',name:'Rest',detail:'Full rest day',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[week]}`,detail:`Trail long run — ${trailLongRuns[week]}, easy effort`},
+      {emoji:'🏃',name:'Back-to-Back Easy Run',detail:'60 min easy effort'},
+    ];
+    return days[dow];
+  }
+  if (phase === 3) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'45 min easy pace'},
+      {emoji:'🏃',name:'Hill Repeats',detail:'45 min — warm up, 6–8 hill repeats, cool down'},
+      {emoji:'🏃',name:'Medium-Long Run',detail:'18km at easy-moderate effort'},
+      {emoji:'🏃',name:'Easy Run',detail:'40 min easy pace'},
+      {emoji:'😴',name:'Rest',detail:'Full rest day',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[week]}`,detail:`Trail long run — ${trailLongRuns[week]}, easy effort`},
+      {emoji:'🏃',name:'Back-to-Back Easy Run',detail:'75 min easy effort'},
+    ];
+    return days[dow];
+  }
+  // Phase 4
+  if (week === 13) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'40 min easy, reduced volume'},
+      {emoji:'😴',name:'Rest or Yoga',detail:'Recovery — stay loose',rest:true},
+      {emoji:'🏃',name:'Easy Run + Strides',detail:'30 min + strides'},
+      {emoji:'🏃',name:'Easy Run',detail:'30 min easy'},
+      {emoji:'😴',name:'Rest',detail:'Full rest day',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[13]}`,detail:'35km — your biggest run'},
+      {emoji:'🥾',name:'Easy Walk',detail:'30 min recovery walk'},
+    ];
+    return days[dow];
+  }
+  if (week === 14) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'35 min easy'},
+      {emoji:'🏋️',name:'Strength',detail:'Light strength — legs & core'},
+      {emoji:'🏃',name:'Tempo Run',detail:'30 min moderate tempo'},
+      {emoji:'🏃',name:'Easy Run',detail:'30 min easy'},
+      {emoji:'😴',name:'Rest',detail:'Full rest day',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[14]}`,detail:'24km moderate effort'},
+      {emoji:'🥾',name:'Easy Hike',detail:'45 min easy'},
+    ];
+    return days[dow];
+  }
+  if (week === 15) {
+    const days = [
+      {emoji:'🏃',name:'Easy Run',detail:'25 min easy — light taper'},
+      {emoji:'😴',name:'Rest',detail:'Full rest',rest:true},
+      {emoji:'🏃',name:'Easy Run + Strides',detail:'20 min + 4 strides'},
+      {emoji:'🏃',name:'Easy Run',detail:'20 min easy'},
+      {emoji:'😴',name:'Rest',detail:'Rest — protect your legs',rest:true},
+      {emoji:'🏃',name:`Long Run · ${trailLongRuns[15]}`,detail:'16km easy — final long run'},
+      {emoji:'😴',name:'Rest',detail:'Rest up',rest:true},
+    ];
+    return days[dow];
+  }
+  // Week 16 — Race week
+  const days = [
+    {emoji:'🏃',name:'Easy Shakeout',detail:'20 min very easy'},
+    {emoji:'😴',name:'Rest',detail:'Rest & visualize',rest:true},
+    {emoji:'🏃',name:'Easy Shakeout',detail:'15 min + 2–3 strides'},
+    {emoji:'😴',name:'Rest',detail:'Feet up — hydrate & eat well',rest:true},
+    {emoji:'😴',name:'Pre-Race Rest',detail:'Gear check, sleep early',rest:true},
+    {emoji:'🏆',name:'RACE DAY — 50K!',detail:'You trained for this. Go crush it.'},
+    {emoji:'😴',name:'Recovery',detail:'Celebrate. You did it!',rest:true},
+  ];
+  return days[dow];
+}
+
+// Denali Plan — 24 weeks
+const denaliLongHikes = {
+  1:'2hr',2:'2hr',3:'3hr',4:'3hr',5:'3.5hr',6:'3.5hr',7:'4hr',8:'4hr'
+};
+
+function denaliDay(week, dow) {
+  const phase = week <= 8 ? 1 : week <= 16 ? 2 : 3;
+  if (phase === 1) {
+    const packW = '20lb pack';
+    const days = [
+      {emoji:'🏋️',name:'Lower Body Strength + Cardio',detail:`Goblet squat 3×10, RDL 3×10, step-ups 3×10 (${packW}), plank 3×30s, dead bug 3×15 · 20 min Zone 2 cardio`},
+      {emoji:'🚴',name:'Zone 2 Cardio',detail:'45 min easy bike or hike — stay in Zone 2'},
+      {emoji:'🏋️',name:'Upper Body Strength + Cardio',detail:`Rows 3×10, press 3×10, pull-ups 3×5 · 30 min cardio`},
+      {emoji:'😴',name:'Rest or Mobility',detail:'Foam roll, stretch, yoga — active recovery',rest:true},
+      {emoji:'🥾',name:'Weighted Pack Walk',detail:`60 min with ${packW}`},
+      {emoji:'🥾',name:`Long Hike · ${denaliLongHikes[week] || '4hr'}`,detail:`Long hike with ${packW} — steady effort`},
+      {emoji:'😴',name:'Recovery Walk or Rest',detail:'Easy walk or full rest',rest:true},
+    ];
+    return days[dow];
+  }
+  if (phase === 2) {
+    const packW = '30–35lb pack';
+    const days = [
+      {emoji:'🏋️',name:'Heavy Strength + Stair Climber',detail:`Deadlift 4×5, squat 4×5, farmer carries · 30 min stair climber with 30lb pack`},
+      {emoji:'🚴',name:'Zone 2 Cardio',detail:'60 min easy cardio — bike, hike, or row'},
+      {emoji:'🏋️',name:'Stair Climber',detail:'60 min stair climber with 35lb pack'},
+      {emoji:'😴',name:'Rest or Mobility',detail:'Recovery — stretch, roll, sleep',rest:true},
+      {emoji:'🥾',name:'Weighted Hike',detail:`90 min with ${packW}`},
+      {emoji:'🏔️',name:'Long Mountain Hike',detail:`5–6 hour hike with pack — gain elevation`},
+      {emoji:'😴',name:'Recovery',detail:'Rest and fuel up',rest:true},
+    ];
+    return days[dow];
+  }
+  // Phase 3
+  const days = [
+    {emoji:'🏋️',name:'Max Strength + Stair Climber',detail:'Max strength session · 45 min stair climber with 40lb pack'},
+    {emoji:'🚴',name:'Zone 2 Cardio',detail:'75 min easy cardio'},
+    {emoji:'🏋️',name:'Stair Climber',detail:'90 min stair climber with 40lb pack'},
+    {emoji:'😴',name:'Rest',detail:'Full rest — your body needs it',rest:true},
+    {emoji:'🥾',name:'Weighted Hike',detail:'2 hours with 40lb pack'},
+    {emoji:'🏔️',name:'Big Mountain Day',detail:'6–8 hour mountain day — push the limits'},
+    {emoji:'😴',name:'Recovery',detail:'Eat, sleep, repeat',rest:true},
+  ];
+  return days[dow];
+}
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('trainingHub_v1') || '{}'); } catch(e) { return {}; }
+}
+function saveState(s) {
+  localStorage.setItem('trainingHub_v1', JSON.stringify(s));
+}
+function loadSettings() {
+  try { return JSON.parse(localStorage.getItem('trainingHub_settings') || '{}'); } catch(e) { return {}; }
+}
+function saveSettingsData(d) {
+  localStorage.setItem('trainingHub_settings', JSON.stringify(d));
+}
+
+let state = loadState();
+let settings = loadSettings();
+
+// ─── DATE UTILS ────────────────────────────────────────────────────────────
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dayOffset(d) {
+  const ms = d - START_DATE;
+  return Math.floor(ms / 86400000);
+}
+function dateFromOffset(offset) {
+  return new Date(START_DATE.getTime() + offset * 86400000);
+}
+function weekAndDow(d) {
+  const offset = dayOffset(d);
+  if (offset < 0) return null;
+  const week = Math.floor(offset / 7) + 1;
+  const dow = offset % 7; // 0=Mon
+  return { week, dow };
+}
+function today() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+const DOW_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function formatDate(d) {
+  return `${DOW_LABELS[d.getDay() === 0 ? 6 : d.getDay()-1]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+// ─── STREAK ────────────────────────────────────────────────────────────────
+
+function calcStreak() {
+  let streak = 0;
+  let d = today();
+  while (true) {
+    const key = dateKey(d);
+    const wd = weekAndDow(d);
+    if (!wd) break;
+    // Count streak only for days within plan range
+    const trailDone = state[`trail_${key}`];
+    const denaliDone = state[`denali_${key}`];
+    const trailInfo = wd.week <= 16 ? trailDay(wd.week, wd.dow) : null;
+    const denaliInfo = wd.week <= 24 ? denaliDay(wd.week, wd.dow) : null;
+    const trailRest = !trailInfo || trailInfo.rest;
+    const denaliRest = !denaliInfo || denaliInfo.rest;
+    // A day counts if all non-rest workouts are completed (or it's all rest)
+    const trailOk = trailRest || trailDone;
+    const denaliOk = denaliRest || denaliDone;
+    if (trailOk && denaliOk) {
+      // Only increment if at least one workout was marked done (not all rest)
+      if (trailDone || denaliDone || (trailRest && denaliRest)) {
+        streak++;
+        d = new Date(d.getTime() - 86400000);
+        continue;
+      }
+    }
+    break;
+  }
+  return streak;
+}
+
+// ─── TODAY VIEW ────────────────────────────────────────────────────────────
+
+function renderToday() {
+  const t = today();
+  const wd = weekAndDow(t);
+  document.getElementById('todayDate').textContent = formatDate(t);
+
+  const grid = document.getElementById('workoutGrid');
+  grid.innerHTML = '';
+
+  if (!wd) {
+    grid.innerHTML = `<div class="rest-card" style="grid-column:1/-1">Training starts June 1, 2026. Get ready!</div>`;
+    return;
+  }
+
+  const { week, dow } = wd;
+  const key = dateKey(t);
+
+  // Trail card
+  if (week <= 16) {
+    const info = trailDay(week, dow);
+    const phase = Math.ceil(week / 4);
+    const phaseLabel = ['Base Building','Build','Peak','Taper & Race'][phase-1];
+    const done = !!state[`trail_${key}`];
+    grid.appendChild(makeWorkoutCard('trail', info, week, phaseLabel, done, key));
+  } else {
+    const div = document.createElement('div');
+    div.className = 'rest-card trail-card';
+    div.innerHTML = `<span style="font-size:1.5rem">🏆</span><span>50K Trail Run complete! You finished the plan.</span>`;
+    grid.appendChild(div);
+  }
+
+  // Denali card
+  if (week <= 24) {
+    const info = denaliDay(week, dow);
+    const phase = week <= 8 ? 1 : week <= 16 ? 2 : 3;
+    const phaseLabel = ['Aerobic Base','Strength & Endurance','Mountaineering Prep'][phase-1];
+    const done = !!state[`denali_${key}`];
+    grid.appendChild(makeWorkoutCard('denali', info, week, phaseLabel, done, key));
+  } else {
+    const div = document.createElement('div');
+    div.className = 'rest-card';
+    div.innerHTML = `<span style="font-size:1.5rem">🏔️</span><span>Denali training complete! Summit awaits.</span>`;
+    grid.appendChild(div);
+  }
+
+  document.getElementById('streakCount').textContent = calcStreak();
+}
+
+function makeWorkoutCard(plan, info, week, phaseLabel, done, key) {
+  const card = document.createElement('div');
+  card.className = `workout-card ${plan}-card${done ? ' completed' : ''}`;
+  card.id = `card-${plan}-${key}`;
+
+  const planLabel = plan === 'trail' ? '🏃 50K Trail Run' : '🏔️ Denali Training';
+  const btnClass = done ? 'complete-btn done' : 'complete-btn';
+  const btnText = done ? '✓ Completed' : 'Mark Complete';
+
+  card.innerHTML = `
+    <div>
+      <div class="card-plan-label">${planLabel}</div>
+      <div class="card-phase">Week ${week} · ${phaseLabel}</div>
+    </div>
+    <div class="card-workout-name">${info.emoji} ${info.name}</div>
+    <div class="card-details">${info.detail}</div>
+    ${info.rest ? '' : `<button class="${btnClass}" onclick="markComplete('${plan}','${key}')" id="btn-${plan}-${key}">${btnText}</button>`}
+    ${info.rest ? '<div style="font-size:0.82rem;color:var(--text-muted);margin-top:auto">Rest day — recovery is training.</div>' : ''}
+  `;
+  return card;
+}
+
+function markComplete(plan, key) {
+  state[`${plan}_${key}`] = Date.now();
+  saveState(state);
+  const btn = document.getElementById(`btn-${plan}-${key}`);
+  if (btn) { btn.textContent = '✓ Completed'; btn.classList.add('done'); }
+  const card = document.getElementById(`card-${plan}-${key}`);
+  if (card) card.classList.add('completed');
+  document.getElementById('streakCount').textContent = calcStreak();
+  renderCalendar(); // refresh calendar
+}
+
+// ─── CALENDAR VIEW ─────────────────────────────────────────────────────────
+
+function renderCalendar() {
+  renderPlanCalendar('calTrail', 'trail', 16, '🏃 50K Trail Run', 'trail');
+  renderPlanCalendar('calDenali', 'denali', 24, '🏔️ Denali Training', 'denali-sq');
+}
+
+function renderPlanCalendar(containerId, plan, totalWeeks, title, sqClass) {
+  const container = document.getElementById(containerId);
+  const t = today();
+  const todayKey = dateKey(t);
+
+  // Count completions
+  let total = 0, done = 0;
+  for (let w = 1; w <= totalWeeks; w++) {
+    for (let d = 0; d < 7; d++) {
+      const offset = (w-1)*7 + d;
+      const date = dateFromOffset(offset);
+      const info = plan === 'trail' ? trailDay(w, d) : denaliDay(w, d);
+      if (!info.rest) {
+        total++;
+        if (state[`${plan}_${dateKey(date)}`]) done++;
+      }
+    }
+  }
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  let html = `
+    <div class="cal-header">
+      <div class="cal-title">${title}</div>
+      <div class="cal-subtitle">${totalWeeks} weeks · ${done}/${total} workouts</div>
+    </div>
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot done"></div>Completed</div>
+      <div class="legend-item"><div class="legend-dot today"></div>Today</div>
+      <div class="legend-item"><div class="legend-dot missed"></div>Missed</div>
+      <div class="legend-item"><div class="legend-dot upcoming"></div>Upcoming</div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill ${plan}" style="width:${pct}%"></div></div>
+    <div class="progress-text">${pct}% complete</div>
+    <div style="margin-top:16px">
+    <div class="day-header-row">
+  `;
+  DOW_LABELS.forEach(l => { html += `<div class="day-header-lbl">${l}</div>`; });
+  html += `</div>`;
+
+  for (let w = 1; w <= totalWeeks; w++) {
+    html += `<div class="week-row"><div class="week-label">W${w}</div><div class="day-squares">`;
+    for (let d = 0; d < 7; d++) {
+      const offset = (w-1)*7 + d;
+      const date = dateFromOffset(offset);
+      const dk = dateKey(date);
+      const info = plan === 'trail' ? trailDay(w, d) : denaliDay(w, d);
+      const isToday = dk === todayKey;
+      const isPast = date < t;
+      const isDone = !!state[`${plan}_${dk}`];
+      const isRest = info.rest;
+
+      let cls = 'day-sq tooltip-wrap';
+      let label = DOW_LABELS[d].charAt(0);
+      if (isRest) {
+        cls += ' rest';
+      } else if (isDone) {
+        cls += plan === 'denali' ? ' done-denali' : ' done';
+        label = '✓';
+      } else if (isToday) {
+        cls += ' today-sq';
+      } else if (isPast && !isRest) {
+        cls += ' missed';
+        label = '!';
+      }
+
+      const dateStr = `${MONTHS[date.getMonth()]} ${date.getDate()}`;
+      const ttStatus = isDone ? 'Completed ✓' : isToday ? 'Today' : isPast && !isRest ? 'Missed' : isRest ? 'Rest' : 'Upcoming';
+      const clickHandler = (!isRest && !isDone && (isToday || isPast)) ? `onclick="calMarkDone('${plan}','${dk}')"` : '';
+
+      html += `<div class="${cls}" ${clickHandler}>
+        ${label}
+        <div class="tooltip-box">
+          <div class="tt-date">${dateStr} · W${w} ${DOW_LABELS[d]}</div>
+          <strong>${info.emoji} ${info.name}</strong><br>
+          <span style="color:var(--text-muted)">${ttStatus}</span>
+        </div>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function calMarkDone(plan, key) {
+  state[`${plan}_${key}`] = Date.now();
+  saveState(state);
+  renderCalendar();
+  document.getElementById('streakCount').textContent = calcStreak();
+  // Re-render today if it matches
+  renderToday();
+}
+
+// ─── TABS ──────────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`view-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.trim().toLowerCase() === tab || (tab==='today' && b.textContent.includes('Today')) || (tab==='calendar' && b.textContent.includes('Calendar'))) {
+      b.classList.add('active');
+    }
+  });
+  if (tab === 'calendar') renderCalendar();
+}
+
+// ─── SETTINGS ──────────────────────────────────────────────────────────────
+
+const CARRIER_NAMES = {
+  'tmomail.net':'T-Mobile','vtext.com':'Verizon','txt.att.net':'AT&T',
+  'messaging.sprintpcs.com':'Sprint','mymetropcs.com':'Metro PCS',
+  'sms.myboostmobile.com':'Boost Mobile','smtext.com':'Cricket','msg.fi.google.com':'Google Fi'
+};
+
+function updateEmail() {
+  const phone = document.getElementById('phoneInput').value.replace(/\D/g,'');
+  const carrier = document.getElementById('carrierSelect').value;
+  const display = document.getElementById('emailDisplay');
+  if (phone.length === 10 && carrier) {
+    display.textContent = `${phone}@${carrier}`;
+  } else {
+    display.textContent = '—';
+  }
+}
+
+function openSettings() {
+  const s = loadSettings();
+  document.getElementById('phoneInput').value = s.phone || '';
+  document.getElementById('carrierSelect').value = s.carrier || '';
+  updateEmail();
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function saveSettings() {
+  const phone = document.getElementById('phoneInput').value.replace(/\D/g,'');
+  const carrier = document.getElementById('carrierSelect').value;
+  saveSettingsData({ phone, carrier });
+  settings = loadSettings();
+  closeSettings();
+}
+
+// Close modal on overlay click
+document.getElementById('settingsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+
+renderToday();
+</script>
+</body>
+</html>
